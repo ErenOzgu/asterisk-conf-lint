@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  go:
+    name: Go ${{ matrix.go }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        go: ["1.21", "1.23"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: ${{ matrix.go }}
+          cache: false # no third-party dependencies, so no go.sum to cache on
+      - name: gofmt
+        run: test -z "$(gofmt -l .)" || { gofmt -l .; exit 1; }
+      - name: go vet
+        run: go vet ./...
+      - name: go test (race)
+        run: go test ./... -race -count=1
+
+  real-asterisk:
+    name: Real Asterisk (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04, ubuntu-24.04]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.23"
+          cache: false
+      - name: Install Asterisk
+        run: |
+          sudo apt-get update -qq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq asterisk python3
+          asterisk -V
+      - name: Build the linter
+        run: go build -o asterisk-conf-lint ./cmd/asterisk-conf-lint
+      - name: The rules hold on a real Asterisk
+        run: sudo env "PATH=$PATH" LINT="$PWD/asterisk-conf-lint" bash hack/real-asterisk.sh
+      - name: Asterisk logs on failure
+        if: failure()
+        run: |
+          sudo find /tmp -name full -path '*log*' 2>/dev/null | head -5 | while read -r f; do echo "== $f"; sudo tail -40 "$f"; done

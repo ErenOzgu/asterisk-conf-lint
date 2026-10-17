@@ -1,0 +1,57 @@
+../../testdata/bad/ari.conf:1  low       ARI-002  password_format is plain (the default)
+    fix: Set password_format = crypt and store crypt(3) hashes (mkpasswd -m sha-512).
+../../testdata/bad/ari.conf:6  high      ARI-001  ARI user "app": the password is a well-known default or guess
+    fix: Use a random password of at least 16 characters.
+../../testdata/bad/asterisk.conf:2  medium    CFG-002  execincludes = yes
+    fix: Remove execincludes = yes unless a file really needs #exec.
+../../testdata/bad/extensions.conf:1  high      CFG-001  #exec /usr/local/bin/gen-dialplan.sh, and asterisk.conf enables execincludes
+    fix: Generate the file at deploy time instead, and keep execincludes off.
+../../testdata/bad/extensions.conf:4  medium    DIAL-001  context [from-anywhere]: pattern _X. dials ${EXTEN} straight to a trunk with no check before it
+    fix: Match only the number ranges you allow, and add Authenticate(), a blocklist check or GROUP() limits before the Dial.
+../../testdata/bad/extensions.conf:6  high      DIAL-002  context [from-anywhere]: System() receives a channel variable
+    fix: Do the work with an AGI/ARI program, or validate the value first (REGEX() or FILTER()).
+../../testdata/bad/http.conf:3  medium    HTTP-001  the HTTP server listens on 0.0.0.0 without TLS
+    fix: Bind to 127.0.0.1 behind a reverse proxy, or enable tlsenable with a certificate.
+../../testdata/bad/manager.conf:3  high      AMI-001  AMI listens on all interfaces (bindaddr = 0.0.0.0)
+    fix: Set bindaddr = 127.0.0.1, or a private address behind a firewall, and use TLS for anything that leaves the host.
+../../testdata/bad/manager.conf:5  high      AMI-002  user "admin" has no deny/permit lines: any host that reaches the port may try to log in
+    fix: Put deny = 0.0.0.0/0.0.0.0 first, then permit = 127.0.0.1/255.255.255.255 (or the addresses that really need access).
+../../testdata/bad/manager.conf:6  high      AMI-003  user "admin": the secret is a well-known default or guess
+    fix: Generate a random secret of at least 16 characters, for example with openssl rand -base64 24.
+../../testdata/bad/manager.conf:8  high      AMI-004  user "admin" has write = all: every AMI action is allowed
+    fix: Give each user only the classes its tools need, and note why a monitoring user needs system (CoreStatus, for one).
+../../testdata/bad/manager.conf:11  medium    AMI-003  user "ops": the secret has only 10 characters (use at least 12)
+    fix: Generate a random secret of at least 16 characters, for example with openssl rand -base64 24.
+../../testdata/bad/manager.conf:13  high      AMI-002  user "ops" permits every address (0.0.0.0/0.0.0.0)
+    fix: Put deny = 0.0.0.0/0.0.0.0 first, then permit = 127.0.0.1/255.255.255.255 (or the addresses that really need access).
+../../testdata/bad/manager.conf:14  medium    AMI-004  user "ops" may use the command class (runs CLI commands or places calls)
+    fix: Give each user only the classes its tools need, and note why a monitoring user needs system (CoreStatus, for one).
+../../testdata/bad/manager.conf:18  high      AMI-002  user "reports" has permit lines but no deny = 0.0.0.0/0.0.0.0, so every other address is still allowed
+    fix: Put deny = 0.0.0.0/0.0.0.0 first, then permit = 127.0.0.1/255.255.255.255 (or the addresses that really need access).
+../../testdata/bad/modules.conf:2  low       MOD-001  autoload = yes and no noload for chan_iax2.so, chan_skinny.so, chan_mgcp.so, chan_unistim.so
+    fix: Add noload = chan_sip.so (and the others listed) to [modules].
+../../testdata/bad/pjsip.conf:5  high      PJS-005  transport "transport-tls" allows sslv3
+    fix: Set method = tlsv1_2 (or tlsv1_3), or leave method unset for the default.
+../../testdata/bad/pjsip.conf:7  high      PJS-001  endpoint "anonymous" exists: calls from unknown senders land in context "default"
+    fix: Remove the anonymous endpoint, or point it at a context that only offers harmless things (a rejection message).
+../../testdata/bad/pjsip.conf:11  high      PJS-002  endpoint "200" has no auth: INVITEs for it are accepted without a password
+    fix: Add auth = <auth section>, or set identify_by = ip and add a type = identify section with the sender's address.
+../../testdata/bad/pjsip.conf:25  high      PJS-003  auth "auth201": the password is the same as the account name
+    fix: Use a random password of at least 16 characters. SIP phones store it once, so length costs nothing.
+../../testdata/bad/pjsip.conf:30  high      PJS-004  identify "trunk-identify" matches 0.0.0.0/0, that is every address
+    fix: List the provider's addresses or networks in match =, one entry each.
+../../testdata/bad/rtp.conf:2  medium    RTP-001  strictrtp = no
+    fix: Remove strictrtp = no (the default is yes) or set strictrtp = yes.
+../../testdata/bad/rtp.conf:3  low       CFG-000  cannot parse: this line is not valid configuration
+    fix: Fix the syntax: key = value, [section], or a #include / #exec line.
+../../testdata/bad/sip.conf:1  high      SIP-001  allowguest is not set and defaults to yes
+    fix: Set allowguest = no in [general].
+../../testdata/bad/sip.conf:1  medium    SIP-002  alwaysauthreject is not enabled
+    fix: Set alwaysauthreject = yes in [general].
+../../testdata/bad/sip.conf:1  low       SIP-005  this file configures chan_sip
+    fix: Plan the move to PJSIP; the wizard in pjsip_wizard.conf keeps the config short.
+../../testdata/bad/sip.conf:8  high      SIP-004  peer "office": the secret is a well-known default or guess
+    fix: Use a random secret of at least 16 characters.
+../../testdata/bad/sip.conf:9  high      SIP-003  peer "office" has insecure = invite
+    fix: Remove insecure = invite; for trunks matched by IP use insecure = port at most, and restrict the host with permit/deny.
+28 findings (17 high, 7 medium, 4 low) in 9 files

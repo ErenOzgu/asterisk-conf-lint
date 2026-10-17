@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="420" viewBox="0 0 1280 420" role="img" aria-labelledby="t d">
+  <title id="t">asterisk-conf-lint</title>
+  <desc id="d">A security linter for Asterisk configuration files: AMI, PJSIP, chan_sip, dialplan. Checked against a real Asterisk.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0d1117"/>
+      <stop offset="1" stop-color="#1b2230"/>
+    </linearGradient>
+    <linearGradient id="glow" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#f68d1f" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#f68d1f" stop-opacity="0"/>
+    </linearGradient>
+    <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse">
+      <path d="M32 0H0V32" fill="none" stroke="#ffffff" stroke-opacity="0.035"/>
+    </pattern>
+  </defs>
+  <rect width="1280" height="420" fill="url(#bg)"/>
+  <rect width="1280" height="420" fill="url(#grid)"/>
+  <rect width="640" height="420" fill="url(#glow)"/>
+  <g transform="translate(0 0)">
+  <g font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif">
+    <text x="64" y="128" font-size="13" letter-spacing="3" fill="#f68d1f" font-weight="600">SECURITY LINTER  ·  ASTERISK</text>
+    <text x="62" y="196" font-size="58" font-weight="700" fill="#f0f6fc">asterisk-conf-lint</text>
+    <text x="64" y="244" font-size="22" fill="#9aa7b8">Finds the mistakes that get a PBX hacked:</text>
+    <text x="64" y="274" font-size="22" fill="#9aa7b8">open AMI, no auth, weak secrets, toll-fraud dialplans.</text>
+    <g font-size="14" font-weight="600" fill="#d0d7de">
+      <rect x="64" y="304" width="151" height="34" rx="17" fill="#ffffff" fill-opacity="0.07" stroke="#ffffff" stroke-opacity="0.14"/><text x="139" y="326" text-anchor="middle">0 dependencies</text>
+      <rect x="227" y="304" width="101" height="34" rx="17" fill="#ffffff" fill-opacity="0.07" stroke="#ffffff" stroke-opacity="0.14"/><text x="277" y="326" text-anchor="middle">25 rules</text>
+      <rect x="340" y="304" width="235" height="34" rx="17" fill="#ffffff" fill-opacity="0.07" stroke="#ffffff" stroke-opacity="0.14"/><text x="457" y="326" text-anchor="middle">checked on real Asterisk</text>
+    </g>
+  </g>
+  <g transform="translate(700 56)">
+    <rect width="516" height="308" rx="12" fill="#0b0f14" stroke="#ffffff" stroke-opacity="0.12"/>
+    <rect width="516" height="38" rx="12" fill="#ffffff" fill-opacity="0.05"/>
+    <circle cx="22" cy="19" r="6" fill="#f85149" fill-opacity="0.85"/>
+    <circle cx="42" cy="19" r="6" fill="#d29922" fill-opacity="0.85"/>
+    <circle cx="62" cy="19" r="6" fill="#3fb950" fill-opacity="0.85"/>
+    <text x="258" y="24" text-anchor="middle" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="12" fill="#8b949e">asterisk-conf-lint /etc/asterisk</text>
+    <g font-family="SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace" font-size="13" fill="#8b949e">
+      <text x="22" y="76" xml:space="preserve"><tspan fill="#8b949e">manager.conf:3</tspan><tspan x="164" fill="#ff7b72">● </tspan><tspan x="182" fill="#79c0ff">AMI-001</tspan><tspan x="258" fill="#e6edf3">listens on all interfaces</tspan></text>
+      <text x="22" y="102" xml:space="preserve"><tspan fill="#8b949e">manager.conf:5</tspan><tspan x="164" fill="#ff7b72">● </tspan><tspan x="182" fill="#79c0ff">AMI-002</tspan><tspan x="258" fill="#e6edf3">user "admin" has no ACL</tspan></text>
+      <text x="22" y="128" xml:space="preserve"><tspan fill="#8b949e">manager.conf:6</tspan><tspan x="164" fill="#ff7b72">● </tspan><tspan x="182" fill="#79c0ff">AMI-003</tspan><tspan x="258" fill="#e6edf3">secret is a known default</tspan></text>
+      <text x="22" y="154" xml:space="preserve"><tspan fill="#8b949e">pjsip.conf:7</tspan><tspan x="164" fill="#ff7b72">● </tspan><tspan x="182" fill="#79c0ff">PJS-001</tspan><tspan x="258" fill="#e6edf3">endpoint "anonymous" exists</tspan></text>
+      <text x="22" y="180" xml:space="preserve"><tspan fill="#8b949e">pjsip.conf:30</tspan><tspan x="164" fill="#ff7b72">● </tspan><tspan x="182" fill="#79c0ff">PJS-004</tspan><tspan x="258" fill="#e6edf3">identify matches 0.0.0.0/0</tspan></text>
+      <text x="22" y="206" xml:space="preserve"><tspan fill="#8b949e">extensions.conf:4</tspan><tspan x="164" fill="#d29922">● </tspan><tspan x="182" fill="#79c0ff">DIAL-001</tspan><tspan x="258" fill="#e6edf3">_X. dials ${EXTEN} to a trunk</tspan></text>
+      <text x="22" y="232" xml:space="preserve"><tspan fill="#8b949e">sip.conf:1</tspan><tspan x="164" fill="#ff7b72">● </tspan><tspan x="182" fill="#79c0ff">SIP-001</tspan><tspan x="258" fill="#e6edf3">guest calls allowed</tspan></text>
+      <text x="22" y="258" xml:space="preserve"><tspan fill="#e6edf3"></tspan></text>
+      <text x="22" y="284" xml:space="preserve"><tspan fill="#e6edf3">28 findings </tspan><tspan fill="#ff7b72">(17 high, </tspan><tspan fill="#d29922">7 medium, </tspan><tspan fill="#8b949e">4 low)</tspan><tspan fill="#e6edf3"> in 9 files</tspan></text>
+    </g>
+  </g>
+  </g>
+</svg>
