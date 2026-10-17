@@ -122,10 +122,10 @@ Severities follow what an attacker gets: **critical** is a login anyone can gues
 
 ## What running it against a real Asterisk taught
 
-The first version of the parser read the stock `/etc/asterisk` of an Ubuntu Asterisk 20 package and was wrong in four ways. These are fixed and tested:
+The first version of the parser read the stock `/etc/asterisk` of Ubuntu's Asterisk 18 and 20 packages and was wrong in four ways. These are fixed and tested:
 
 - **Keys can contain spaces.** `show channeltypes = core show channeltypes` in `cli_aliases.conf` is valid. The parser split at the first `=` and trimmed, as Asterisk does, instead of rejecting it.
-- **Not every `.conf` is Asterisk syntax.** `ast_debug_tools.conf` is sourced by bash and `dbsep.conf` belongs to a Perl script. Both are skipped by name.
+- **Not every `.conf` is Asterisk syntax.** `ast_debug_tools.conf` is sourced by bash, `dbsep.conf` belongs to a Perl script and `muted.conf` to a separate utility. All three are skipped by name.
 - **Asterisk stops at the first bad line.** `geolocation.conf` in the stock package has a stray block at line 310 and Asterisk answers `parse error: No category context for line 310`. The linter reports the first unreadable line of a file, with a count of the rest, which is the line that matters.
 - **A `permit` without a `deny` restricts nothing.** The AMI access list allows every address that no rule mentions. `hack/real-asterisk.sh` proves it: a user with only `permit = 10.0.0.0/255.0.0.0` logs in from `127.0.0.2`.
 
@@ -137,7 +137,7 @@ The first version of the parser read the stock `/etc/asterisk` of an Ubuntu Aste
 | Every rule | Positive and negative cases, including the boundaries (11 vs 12 character secrets, `bindaddr` loopback in four spellings, `deny` of one network vs everything) |
 | Output | A golden text file, JSON that parses, SARIF with consistent rule indexes and levels, exit codes of the CLI |
 | Docs | The rule table in this README must equal `-list-rules -format markdown` |
-| **Real Asterisk** | [`hack/real-asterisk.sh`](hack/real-asterisk.sh) starts Asterisk 18 (Ubuntu 22.04) and 20 (24.04) on the fixtures and checks the claims: the good configuration loads, AMI listens on loopback only and its ACL keeps `127.0.0.2` out; on the bad one AMI really listens on `0.0.0.0`, `admin`/`admin` logs in, chan_sip allows guests, and every line Asterisk rejects is a `CFG-000` finding |
+| **Real Asterisk** | [`hack/real-asterisk.sh`](hack/real-asterisk.sh) starts Asterisk 18 (Ubuntu 22.04) and 20 (24.04) on the fixtures and checks the claims: the good configuration loads, AMI listens on loopback only and its ACL keeps `127.0.0.2` out; on the bad one AMI really listens on `0.0.0.0`, `admin`/`admin` logs in, chan_sip allows guests, `#exec` really runs, and every line Asterisk rejects is a `CFG-000` finding |
 
 The configuration that [asterisk-gcp-iac](https://github.com/ErenOzgu/asterisk-gcp-iac) renders passes with one low finding, `AMI-004` for the exporter's `system` class (CoreStatus needs it).
 

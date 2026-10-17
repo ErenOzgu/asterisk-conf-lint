@@ -39,6 +39,7 @@ start() { # start NAME OVERLAY-DIR [FILE-TO-REMOVE...]
   cp -r /etc/asterisk "$dir/etc"
   cp -r "$overlay"/. "$dir/etc/"
   for f in "$@"; do rm -f "$dir/etc/$f"; done
+  if declare -F "prestart_$name" >/dev/null; then "prestart_$name"; fi
   cat >"$dir/etc/asterisk.conf.tmp" <<CONF
 [directories]
 astetcdir => $dir/etc
@@ -86,7 +87,8 @@ if [ "$(listeners 8088)" = "127.0.0.1:8088" ]; then ok "HTTP listens on 127.0.0.
 # What Asterisk complains about while loading, and what the linter says.
 agree() { # agree DIR: every unreadable line Asterisk names must be a CFG-000 finding
   local d=$1 log=$1/log/full missing=0
-  grep -oE 'line [0-9]+ of [^ ]+' "$log" | sort -u | while read -r _ n _ file; do
+  # exec.* are the temporary files that hold the output of #exec directives.
+  grep -oE 'line [0-9]+ of [^ ]+' "$log" | grep -v ' of exec\.' | sort -u | while read -r _ n _ file; do
     printf '%s:%s\n' "$(basename "$file")" "$n"
   done >"$d/asterisk-lines.txt"
   "$lint" -format json -fail-on none "$d/etc" | python3 "$root/hack/lint_lines.py" | sort -u >"$d/linter-lines.txt"
@@ -106,6 +108,17 @@ if [ -z "$unexpected" ]; then ok "the linter finds nothing in the good configura
 stop
 
 # ---------------------------------------------------------------- bad/
+# The bad extensions.conf has an #exec line and the bad asterisk.conf switches
+# execincludes on. Point the command at a script that leaves a marker, to see
+# whether Asterisk really runs it.
+prestart_bad() {
+  cat >"$work/gen-dialplan.sh" <<SCRIPT
+#!/bin/sh
+touch "$work/exec-ran"
+SCRIPT
+  chmod +x "$work/gen-dialplan.sh"
+  sed -i "s|/usr/local/bin/gen-dialplan.sh|$work/gen-dialplan.sh|" "$dir/etc/extensions.conf"
+}
 echo "== bad configuration"
 start bad "$root/testdata/bad" || { bad "Asterisk did not start on the bad configuration"; exit 1; }
 [ "$(listeners 5038)" = "0.0.0.0:5038" ] && ok "AMI-001: AMI really listens on 0.0.0.0" || bad "AMI listeners: $(listeners 5038)"
@@ -115,6 +128,7 @@ start bad "$root/testdata/bad" || { bad "Asterisk did not start on the bad confi
   && ok "AMI-002: permit 10.0.0.0/8 without a deny does not keep 127.0.0.2 out" || bad "reports from 127.0.0.2 was rejected"
 expect "PJS-001: the anonymous endpoint exists" bash -c "$(declare -f cli); dir=$dir; cli 'pjsip show endpoints' | grep -q 'anonymous'"
 expect "SIP-001: chan_sip allows unknown (guest) callers" bash -c "$(declare -f cli); dir=$dir; cli 'sip show settings' | grep -i 'allow unknown access' | grep -qi 'yes'"
+[ -f "$work/exec-ran" ] && ok "CFG-001/002: with execincludes = yes Asterisk really runs the #exec command" || bad "the #exec command was not run"
 if agree "$dir"; then ok "every line Asterisk rejects is reported as CFG-000 ($(wc -l <"$dir/asterisk-lines.txt") of them)"; else bad "linter misses lines Asterisk rejects"; fi
 stop
 

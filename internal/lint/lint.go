@@ -90,6 +90,7 @@ func suppressed(fd rules.Finding, ignores []conf.Ignore) bool {
 var notAsteriskFormat = map[string]bool{
 	"ast_debug_tools.conf": true, // sourced by bash
 	"dbsep.conf":           true, // read by a Perl CGI script, "#" comments
+	"muted.conf":           true, // configures the separate "muted" utility
 }
 
 func collect(path string) ([]*conf.File, error) {
