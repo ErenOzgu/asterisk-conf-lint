@@ -54,7 +54,7 @@ jobs:
       - name: Build the linter
         run: go build -o asterisk-conf-lint ./cmd/asterisk-conf-lint
       - name: The rules hold on a real Asterisk
-        run: sudo env "PATH=$PATH" LINT="$PWD/asterisk-conf-lint" bash hack/real-asterisk.sh
+        run: sudo env "PATH=$PATH" LINT="$PWD/asterisk-conf-lint" hack/annotate.sh bash hack/real-asterisk.sh
       - name: Asterisk logs on failure
         if: failure()
         run: |
